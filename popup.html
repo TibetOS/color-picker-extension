@@ -9,31 +9,127 @@
 <body>
     <div class="container">
         <!-- Pick Color Button -->
-        <button id="pickColor" class="pick-btn">
+        <button id="pickColor" class="pick-btn" title="Press P to pick">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M12 2L12 6M12 18L12 22M2 12L6 12M18 12L22 12"/>
                 <circle cx="12" cy="12" r="4"/>
             </svg>
             Pick Color
+            <span class="shortcut-hint">P</span>
         </button>
 
         <!-- Current Color Display -->
         <div id="colorDisplay" class="color-display">
             <div id="colorPreview" class="color-preview"></div>
             <div class="color-info">
-                <div class="format-tabs">
-                    <button class="format-tab active" data-format="hex">HEX</button>
-                    <button class="format-tab" data-format="rgb">RGB</button>
-                    <button class="format-tab" data-format="hsl">HSL</button>
+                <!-- Format Selector -->
+                <div class="format-selector">
+                    <div class="format-tabs">
+                        <button class="format-tab active" data-format="hex">HEX</button>
+                        <button class="format-tab" data-format="rgb">RGB</button>
+                        <button class="format-tab" data-format="hsl">HSL</button>
+                        <button class="format-tab more-btn" data-format="more" id="moreFormatsBtn">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <!-- Extended formats dropdown -->
+                    <div id="moreFormats" class="more-formats hidden">
+                        <button class="format-option" data-format="rgba">RGBA</button>
+                        <button class="format-option" data-format="hsla">HSLA</button>
+                        <button class="format-option" data-format="hex8">HEX8</button>
+                        <button class="format-option" data-format="tailwind">Tailwind</button>
+                        <button class="format-option" data-format="cssvar">CSS Var</button>
+                    </div>
                 </div>
                 <div class="color-value-container">
                     <span id="colorValue" class="color-value">Pick a color</span>
-                    <button id="copyBtn" class="copy-btn" title="Copy to clipboard">
+                    <button id="copyBtn" class="copy-btn" title="Copy (C)">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <rect x="9" y="9" width="13" height="13" rx="2"/>
                             <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
                         </svg>
                     </button>
+                </div>
+                <!-- Tailwind match indicator -->
+                <div id="tailwindMatch" class="tailwind-match hidden">
+                    <span class="match-label">Closest Tailwind:</span>
+                    <span id="tailwindValue" class="match-value"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contrast Checker -->
+        <div class="tools-section">
+            <div class="section-header" id="contrastToggle">
+                <span>Contrast</span>
+                <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 12 15 18 9"/>
+                </svg>
+            </div>
+            <div id="contrastPanel" class="panel hidden">
+                <div class="contrast-row">
+                    <div class="contrast-swatch" style="background: #fff">
+                        <span id="contrastWhite">-</span>
+                    </div>
+                    <div class="contrast-swatch dark" style="background: #000">
+                        <span id="contrastBlack">-</span>
+                    </div>
+                </div>
+                <div class="wcag-badges">
+                    <span id="wcagAA" class="badge">AA</span>
+                    <span id="wcagAAA" class="badge">AAA</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Color Adjustments -->
+        <div class="tools-section">
+            <div class="section-header" id="adjustToggle">
+                <span>Adjust</span>
+                <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 12 15 18 9"/>
+                </svg>
+            </div>
+            <div id="adjustPanel" class="panel hidden">
+                <div class="slider-row">
+                    <label>Lightness</label>
+                    <input type="range" id="lightnessSlider" min="-50" max="50" value="0">
+                    <span id="lightnessValue">0%</span>
+                </div>
+                <div class="slider-row">
+                    <label>Saturation</label>
+                    <input type="range" id="saturationSlider" min="-50" max="50" value="0">
+                    <span id="saturationValue">0%</span>
+                </div>
+                <div class="adjust-preview">
+                    <div id="adjustedPreview" class="adjusted-swatch"></div>
+                    <button id="applyAdjust" class="apply-btn">Apply</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Color Harmonies -->
+        <div class="tools-section">
+            <div class="section-header" id="harmoniesToggle">
+                <span>Harmonies</span>
+                <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 12 15 18 9"/>
+                </svg>
+            </div>
+            <div id="harmoniesPanel" class="panel hidden">
+                <div class="harmony-type">
+                    <span>Complementary</span>
+                    <div id="complementary" class="harmony-colors"></div>
+                </div>
+                <div class="harmony-type">
+                    <span>Analogous</span>
+                    <div id="analogous" class="harmony-colors"></div>
+                </div>
+                <div class="harmony-type">
+                    <span>Triadic</span>
+                    <div id="triadic" class="harmony-colors"></div>
                 </div>
             </div>
         </div>
@@ -41,22 +137,81 @@
         <!-- Toast Notification -->
         <div id="toast" class="toast">Copied!</div>
 
-        <!-- Color History -->
+        <!-- Color History / Palettes -->
         <div class="history-section">
             <div class="history-header">
-                <span>History</span>
-                <button id="clearHistory" class="clear-btn" title="Clear history">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
-                    </svg>
-                </button>
+                <div class="tab-switcher">
+                    <button class="tab-btn active" data-tab="history">History</button>
+                    <button class="tab-btn" data-tab="palettes">Palettes</button>
+                </div>
+                <div class="history-actions">
+                    <button id="exportBtn" class="action-btn" title="Export">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                        </svg>
+                    </button>
+                    <button id="clearHistory" class="action-btn" title="Clear">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
-            <div id="historyGrid" class="history-grid">
-                <div class="empty-history">No colors yet</div>
+
+            <!-- History Tab -->
+            <div id="historyTab" class="tab-content active">
+                <div id="historyGrid" class="history-grid">
+                    <div class="empty-history">No colors yet</div>
+                </div>
+            </div>
+
+            <!-- Palettes Tab -->
+            <div id="palettesTab" class="tab-content hidden">
+                <div class="palette-controls">
+                    <select id="paletteSelect" class="palette-dropdown">
+                        <option value="">Select palette...</option>
+                    </select>
+                    <button id="newPaletteBtn" class="new-palette-btn" title="New Palette">+</button>
+                </div>
+                <div id="paletteGrid" class="history-grid">
+                    <div class="empty-history">No palette selected</div>
+                </div>
+                <button id="addToPalette" class="add-to-palette-btn hidden">Add Current Color</button>
+            </div>
+        </div>
+
+        <!-- Export Modal -->
+        <div id="exportModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span>Export Colors</span>
+                    <button id="closeExport" class="close-btn">&times;</button>
+                </div>
+                <div class="export-options">
+                    <button class="export-option" data-format="json">JSON</button>
+                    <button class="export-option" data-format="css">CSS Variables</button>
+                    <button class="export-option" data-format="scss">SCSS</button>
+                    <button class="export-option" data-format="tailwind">Tailwind</button>
+                </div>
+                <textarea id="exportOutput" class="export-output" readonly></textarea>
+                <button id="copyExport" class="copy-export-btn">Copy to Clipboard</button>
+            </div>
+        </div>
+
+        <!-- New Palette Modal -->
+        <div id="paletteModal" class="modal hidden">
+            <div class="modal-content small">
+                <div class="modal-header">
+                    <span>New Palette</span>
+                    <button id="closePalette" class="close-btn">&times;</button>
+                </div>
+                <input type="text" id="paletteName" class="palette-input" placeholder="Palette name...">
+                <button id="createPalette" class="create-palette-btn">Create</button>
             </div>
         </div>
     </div>
 
+    <script src="tailwind-colors.js"></script>
     <script src="popup.js"></script>
 </body>
 </html>
