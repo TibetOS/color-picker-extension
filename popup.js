@@ -1,4 +1,4 @@
-// Color Picker Pro v2.0 - Full Featured Color Picker
+// Color Picker v2.0 - Full Featured Color Picker
 
 class ColorPickerApp {
     constructor() {

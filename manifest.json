@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Color Picker Pro",
+  "name": "Color Picker",
   "version": "2.0.0",
   "description": "Full-featured color picker with eye dropper, multiple formats (HEX, RGB, HSL, Tailwind), contrast checker, color harmonies, palettes & export.",
   "permissions": ["storage", "clipboardWrite"],

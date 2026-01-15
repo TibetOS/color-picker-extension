@@ -1,4 +1,4 @@
-// Color Picker Pro v2.0 - Background Service Worker
+// Color Picker v2.0 - Background Service Worker
 
 // Handle extension installation
 chrome.runtime.onInstalled.addListener((details) => {
@@ -10,9 +10,9 @@ chrome.runtime.onInstalled.addListener((details) => {
             activePalette: null,
             lastFormat: 'hex'
         });
-        console.log('Color Picker Pro v2.0 installed');
+        console.log('Color Picker v2.0 installed');
     } else if (details.reason === 'update') {
-        console.log('Color Picker Pro updated to v2.0');
+        console.log('Color Picker updated to v2.0');
     }
 });
 
