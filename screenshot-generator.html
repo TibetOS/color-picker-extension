@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Picker - Screenshot Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1f35 0%, #0d1321 100%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        .screenshot-container {
+            width: 1280px;
+            height: 800px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 60px 80px;
+            margin: 20px auto;
+            border: 2px dashed #444;
+            position: relative;
+        }
+
+        .screenshot-container::before {
+            content: attr(data-label);
+            position: absolute;
+            top: -30px;
+            left: 0;
+            color: #888;
+            font-size: 14px;
+        }
+
+        .content-left {
+            max-width: 500px;
+        }
+
+        .content-left h1 {
+            font-size: 56px;
+            font-weight: 700;
+            color: #8b7cf7;
+            margin-bottom: 24px;
+        }
+
+        .content-left p {
+            font-size: 22px;
+            color: #a0a6b8;
+            line-height: 1.5;
+            margin-bottom: 40px;
+        }
+
+        .features {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .feature-icon {
+            width: 44px;
+            height: 44px;
+            background: rgba(139, 124, 247, 0.15);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .feature span {
+            font-size: 20px;
+            color: #e0e4ed;
+        }
+
+        /* Mock Extension Popup */
+        .popup-mock {
+            width: 320px;
+            background: #1e2337;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .popup-header {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+
+        .popup-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .popup-dot.red { background: #ff5f57; }
+        .popup-dot.yellow { background: #febc2e; }
+        .popup-dot.green { background: #28c840; }
+
+        .pick-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .color-preview {
+            width: 100%;
+            height: 100px;
+            border-radius: 10px;
+            margin-bottom: 16px;
+        }
+
+        .format-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .format-tab {
+            flex: 1;
+            padding: 10px;
+            background: #2a3150;
+            border: none;
+            border-radius: 8px;
+            color: #8892b0;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .format-tab.active {
+            background: #4ecdc4;
+            color: white;
+        }
+
+        .color-value {
+            background: #252b43;
+            border-radius: 8px;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .color-value code {
+            color: #e0e4ed;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 14px;
+        }
+
+        .copy-icon {
+            color: #8892b0;
+            cursor: pointer;
+        }
+
+        .history-label {
+            font-size: 11px;
+            color: #8892b0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .history-colors {
+            display: flex;
+            gap: 8px;
+        }
+
+        .history-color {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        /* Screenshot 2 - Multiple Formats */
+        .formats-content h1 {
+            font-size: 48px;
+        }
+
+        .formats-content h1 span {
+            color: #4ecdc4;
+        }
+
+        .format-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .format-badge {
+            padding: 12px 20px;
+            background: rgba(78, 205, 196, 0.15);
+            border: 1px solid rgba(78, 205, 196, 0.3);
+            border-radius: 24px;
+            color: #4ecdc4;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 15px;
+        }
+
+        .two-popups {
+            display: flex;
+            gap: 30px;
+        }
+
+        .two-popups .popup-mock {
+            width: 280px;
+            transform: scale(0.95);
+        }
+
+        /* Screenshot 3 - Contrast Checker */
+        .contrast-section {
+            background: #252b43;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .contrast-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .contrast-label {
+            font-size: 12px;
+            color: #8892b0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .contrast-ratio {
+            font-size: 20px;
+            font-weight: 700;
+            color: #4ecdc4;
+        }
+
+        .wcag-badges {
+            display: flex;
+            gap: 8px;
+        }
+
+        .wcag-badge {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .wcag-badge.pass {
+            background: rgba(40, 200, 64, 0.2);
+            color: #28c840;
+        }
+
+        .wcag-badge.fail {
+            background: rgba(255, 95, 87, 0.2);
+            color: #ff5f57;
+        }
+
+        /* Floating color swatches decoration */
+        .floating-colors {
+            position: absolute;
+            right: 100px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .float-swatch {
+            width: 60px;
+            height: 60px;
+            border-radius: 14px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Instructions */
+        .instructions {
+            max-width: 1280px;
+            margin: 40px auto;
+            padding: 30px;
+            background: #1e2337;
+            border-radius: 12px;
+        }
+
+        .instructions h2 {
+            color: #8b7cf7;
+            margin-bottom: 16px;
+        }
+
+        .instructions ol {
+            color: #a0a6b8;
+            padding-left: 24px;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+        }
+
+        .instructions code {
+            background: #252b43;
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: #4ecdc4;
+        }
+    </style>
+</head>
+<body>
+    <div class="instructions">
+        <h2>Screenshot Instructions</h2>
+        <ol>
+            <li>Each bordered section below is exactly <code>1280x800</code> pixels</li>
+            <li>Use browser DevTools or a screenshot tool to capture each section</li>
+            <li>On Mac: <code>Cmd+Shift+4</code> then drag to select the area</li>
+            <li>Or use Chrome DevTools: <code>Cmd+Shift+P</code> → "Capture node screenshot"</li>
+            <li>Save as PNG files in the <code>dist/</code> folder</li>
+        </ol>
+    </div>
+
+    <!-- Screenshot 1: Main Features -->
+    <div class="screenshot-container" data-label="Screenshot 1: Main Features (1280x800)">
+        <div class="content-left">
+            <h1>Color Picker</h1>
+            <p>Pick any color from your screen with a single click. Perfect for designers and developers.</p>
+            <div class="features">
+                <div class="feature">
+                    <div class="feature-icon">🎯</div>
+                    <span>Eye Dropper Tool</span>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🎨</div>
+                    <span>HEX, RGB, HSL Formats</span>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">📋</div>
+                    <span>Color History</span>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">📄</div>
+                    <span>One-Click Copy</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="popup-mock">
+            <div class="popup-header">
+                <div class="popup-dot red"></div>
+                <div class="popup-dot yellow"></div>
+                <div class="popup-dot green"></div>
+            </div>
+            <button class="pick-btn">
+                <span>✦</span> Pick Color
+            </button>
+            <div class="color-preview" style="background: #667EEA;"></div>
+            <div class="format-tabs">
+                <button class="format-tab active">HEX</button>
+                <button class="format-tab">RGB</button>
+                <button class="format-tab">HSL</button>
+            </div>
+            <div class="color-value">
+                <code>#667EEA</code>
+                <span class="copy-icon">📋</span>
+            </div>
+            <div class="history-label">History</div>
+            <div class="history-colors">
+                <div class="history-color" style="background: #5B6DE8;"></div>
+                <div class="history-color" style="background: #9B59B6;"></div>
+                <div class="history-color" style="background: #FF6B6B;"></div>
+                <div class="history-color" style="background: #4ECDC4;"></div>
+                <div class="history-color" style="background: #F7DC6F;"></div>
+            </div>
+        </div>
+
+        <div class="floating-colors">
+            <div class="float-swatch" style="background: #FF6B6B;"></div>
+            <div class="float-swatch" style="background: #F7DC6F;"></div>
+        </div>
+    </div>
+
+    <!-- Screenshot 2: Multiple Formats -->
+    <div class="screenshot-container" data-label="Screenshot 2: Multiple Formats (1280x800)">
+        <div class="two-popups">
+            <div class="popup-mock">
+                <div class="popup-header">
+                    <div class="popup-dot red"></div>
+                    <div class="popup-dot yellow"></div>
+                    <div class="popup-dot green"></div>
+                </div>
+                <button class="pick-btn">
+                    <span>✦</span> Pick Color
+                </button>
+                <div class="color-preview" style="background: #FF6B6B;"></div>
+                <div class="format-tabs">
+                    <button class="format-tab active">HEX</button>
+                    <button class="format-tab">RGB</button>
+                    <button class="format-tab">HSL</button>
+                </div>
+                <div class="color-value">
+                    <code>#FF6B6B</code>
+                    <span class="copy-icon">📋</span>
+                </div>
+                <div class="history-label">History</div>
+                <div class="history-colors">
+                    <div class="history-color" style="background: #FF6B6B;"></div>
+                    <div class="history-color" style="background: #4ECDC4;"></div>
+                    <div class="history-color" style="background: #5B6DE8;"></div>
+                    <div class="history-color" style="background: #9B59B6;"></div>
+                    <div class="history-color" style="background: #F7DC6F;"></div>
+                    <div class="history-color" style="background: #E0E4ED;"></div>
+                </div>
+            </div>
+
+            <div class="popup-mock">
+                <div class="popup-header">
+                    <div class="popup-dot red"></div>
+                    <div class="popup-dot yellow"></div>
+                    <div class="popup-dot green"></div>
+                </div>
+                <button class="pick-btn">
+                    <span>✦</span> Pick Color
+                </button>
+                <div class="color-preview" style="background: #4ECDC4;"></div>
+                <div class="format-tabs">
+                    <button class="format-tab">HEX</button>
+                    <button class="format-tab active">RGB</button>
+                    <button class="format-tab">HSL</button>
+                </div>
+                <div class="color-value">
+                    <code>rgb(78, 205, 196)</code>
+                    <span class="copy-icon">📋</span>
+                </div>
+                <div class="history-label">History</div>
+                <div class="history-colors">
+                    <div class="history-color" style="background: #4ECDC4;"></div>
+                    <div class="history-color" style="background: #FF6B6B;"></div>
+                    <div class="history-color" style="background: #9B59B6;"></div>
+                    <div class="history-color" style="background: #5B6DE8;"></div>
+                    <div class="history-color" style="background: #28C840;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-left formats-content">
+            <h1>Multiple <span>Formats</span></h1>
+            <p>Copy colors in the format you need. Switch between HEX, RGB, and HSL with a single click.</p>
+            <div class="format-badges">
+                <span class="format-badge">#FF6B6B</span>
+                <span class="format-badge">rgb(78, 205, 196)</span>
+                <span class="format-badge">hsl(174, 57%, 55%)</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screenshot 3: Contrast Checker -->
+    <div class="screenshot-container" data-label="Screenshot 3: Contrast Checker (1280x800)">
+        <div class="content-left">
+            <h1>Contrast <span style="color: #4ecdc4;">Checker</span></h1>
+            <p>Ensure your color combinations meet WCAG accessibility standards for better readability.</p>
+            <div class="features">
+                <div class="feature">
+                    <div class="feature-icon">✓</div>
+                    <span>WCAG AA Compliance</span>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">✓</div>
+                    <span>WCAG AAA Compliance</span>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🔢</div>
+                    <span>Real-time Ratio</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="popup-mock" style="width: 340px;">
+            <div class="popup-header">
+                <div class="popup-dot red"></div>
+                <div class="popup-dot yellow"></div>
+                <div class="popup-dot green"></div>
+            </div>
+            <div class="contrast-section">
+                <div class="contrast-header">
+                    <span class="contrast-label">Contrast Ratio</span>
+                    <span class="contrast-ratio">7.21:1</span>
+                </div>
+                <div class="wcag-badges">
+                    <span class="wcag-badge pass">AA ✓</span>
+                    <span class="wcag-badge pass">AA Large ✓</span>
+                    <span class="wcag-badge pass">AAA ✓</span>
+                </div>
+            </div>
+            <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+                <div style="flex: 1;">
+                    <div class="history-label">Foreground</div>
+                    <div style="background: #1a1f35; height: 50px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                        <code style="color: #fff;">#1A1F35</code>
+                    </div>
+                </div>
+                <div style="flex: 1;">
+                    <div class="history-label">Background</div>
+                    <div style="background: #ffffff; height: 50px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                        <code style="color: #1a1f35;">#FFFFFF</code>
+                    </div>
+                </div>
+            </div>
+            <div style="background: #ffffff; border-radius: 8px; padding: 16px; text-align: center;">
+                <span style="color: #1a1f35; font-size: 18px; font-weight: 600;">Sample Text</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screenshot 4: Palettes -->
+    <div class="screenshot-container" data-label="Screenshot 4: Color Palettes (1280x800)">
+        <div class="content-left">
+            <h1>Color <span style="color: #9B59B6;">Palettes</span></h1>
+            <p>Save and organize your favorite colors into custom palettes. Export to CSS, SCSS, or Tailwind.</p>
+            <div class="features">
+                <div class="feature">
+                    <div class="feature-icon">📁</div>
+                    <span>Create Custom Palettes</span>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">💾</div>
+                    <span>Auto-save to Browser</span>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">📤</div>
+                    <span>Export to CSS/SCSS/Tailwind</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="popup-mock" style="width: 340px;">
+            <div class="popup-header">
+                <div class="popup-dot red"></div>
+                <div class="popup-dot yellow"></div>
+                <div class="popup-dot green"></div>
+            </div>
+            <div class="history-label">Active Palette: Brand Colors</div>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px;">
+                <div style="aspect-ratio: 1; background: #667EEA; border-radius: 8px;"></div>
+                <div style="aspect-ratio: 1; background: #9B59B6; border-radius: 8px;"></div>
+                <div style="aspect-ratio: 1; background: #4ECDC4; border-radius: 8px;"></div>
+                <div style="aspect-ratio: 1; background: #FF6B6B; border-radius: 8px;"></div>
+                <div style="aspect-ratio: 1; background: #F7DC6F; border-radius: 8px;"></div>
+                <div style="aspect-ratio: 1; background: #28C840; border-radius: 8px;"></div>
+                <div style="aspect-ratio: 1; background: #1A1F35; border-radius: 8px;"></div>
+                <div style="aspect-ratio: 1; background: #FFFFFF; border-radius: 8px; border: 1px solid #333;"></div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button style="flex: 1; padding: 10px; background: #4ECDC4; border: none; border-radius: 8px; color: white; font-weight: 600; cursor: pointer;">Export</button>
+                <button style="flex: 1; padding: 10px; background: #2a3150; border: none; border-radius: 8px; color: #8892b0; font-weight: 600; cursor: pointer;">+ New</button>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
