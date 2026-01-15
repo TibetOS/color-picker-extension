@@ -3,7 +3,7 @@
   "name": "Color Picker Pro",
   "version": "2.0.0",
   "description": "Full-featured color picker with eye dropper, multiple formats (HEX, RGB, HSL, Tailwind), contrast checker, color harmonies, palettes & export.",
-  "permissions": ["activeTab", "storage", "clipboardWrite"],
+  "permissions": ["storage", "clipboardWrite"],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
