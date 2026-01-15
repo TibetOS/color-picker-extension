@@ -4,7 +4,7 @@
     'use strict';
 
     // Chrome Web Store URL - Update this when published
-    const CHROME_STORE_URL = 'https://chrome.google.com/webstore/detail/color-picker/YOUR_EXTENSION_ID';
+    const CHROME_STORE_URL = 'https://chrome.google.com/webstore/detail/color-picker/hbedfhfdgkkjdanlddbafilbcgpinkce';
 
     // Set Chrome Web Store links
     const storeButtons = document.querySelectorAll('#chromeStoreBtn, #chromeStoreBtn2, #chromeStoreBtn3');
